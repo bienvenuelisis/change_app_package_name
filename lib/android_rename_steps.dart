@@ -8,9 +8,12 @@ class AndroidRenameSteps {
   String? oldPackageName;
 
   static const String PATH_BUILD_GRADLE = 'android/app/build.gradle';
-  static const String PATH_MANIFEST = 'android/app/src/main/AndroidManifest.xml';
-  static const String PATH_MANIFEST_DEBUG = 'android/app/src/debug/AndroidManifest.xml';
-  static const String PATH_MANIFEST_PROFILE = 'android/app/src/profile/AndroidManifest.xml';
+  static const String PATH_MANIFEST =
+      'android/app/src/main/AndroidManifest.xml';
+  static const String PATH_MANIFEST_DEBUG =
+      'android/app/src/debug/AndroidManifest.xml';
+  static const String PATH_MANIFEST_PROFILE =
+      'android/app/src/profile/AndroidManifest.xml';
 
   static const String PATH_ACTIVITY = 'android/app/src/main/';
 
@@ -18,13 +21,18 @@ class AndroidRenameSteps {
 
   Future<void> process() async {
     if (!await File(PATH_BUILD_GRADLE).exists()) {
-      print('ERROR:: build.gradle file not found, Check if you have a correct android directory present in your project'
+      print(
+          'ERROR:: build.gradle file not found, Check if you have a correct android directory present in your project'
           '\n\nrun " flutter create . " to regenerate missing files.');
       return;
     }
     String? contents = await readFileAsString(PATH_BUILD_GRADLE);
 
-    var reg = RegExp('applicationId "(.*)"', caseSensitive: true, multiLine: false);
+    var reg = RegExp(
+      'applicationId = "(.*)"',
+      caseSensitive: true,
+      multiLine: false,
+    );
 
     var name = reg.firstMatch(contents!)!.group(1);
     oldPackageName = name;
@@ -65,7 +73,8 @@ class AndroidRenameSteps {
     var extension = type == 'java' ? 'java' : 'kt';
     print('Project is using $type');
     print('Updating MainActivity.$extension');
-    await replaceInFileRegex(path.path, '(package.*)', "package ${newPackageName}");
+    await replaceInFileRegex(
+        path.path, '(package.*)', "package ${newPackageName}");
 
     String newPackagePath = newPackageName.replaceAll('.', '/');
     String newPath = '${PATH_ACTIVITY}${type}/$newPackagePath';
@@ -95,7 +104,7 @@ class AndroidRenameSteps {
     }
   }
 
-  Future<File?> findMainActivity({String type: 'java'}) async {
+  Future<File?> findMainActivity({String type = 'java'}) async {
     var files = await dirContents(Directory(PATH_ACTIVITY + type));
     String extension = type == 'java' ? 'java' : 'kt';
     for (var item in files) {
